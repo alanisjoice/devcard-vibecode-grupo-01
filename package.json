@@ -1,25 +1,16 @@
 {
-  "name": "backend-fundamentos",
+  "name": "devcard-vibecode",
   "version": "1.0.0",
-  "description": "API simples para aula de fundamentos com Node e Express",
-  "main": "server.js",
-  "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js"
-  },
-  "keywords": [
-    "node",
-    "express",
-    "api",
-    "ensino-medio"
-  ],
-  "author": "3º SIS",
+  "private": true,
+  "description": "DevCard VibeCode - React + Express publicado em uma unica URL",
   "license": "ISC",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^4.18.3"
+  "engines": {
+    "node": ">=22.12"
   },
-  "devDependencies": {
-    "nodemon": "^3.1.0"
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+    "start": "cd backend && npm start",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev"
   }
 }

@@ -1,0 +1,27 @@
+{
+  "name": "backend-fundamentos",
+  "version": "1.0.0",
+  "description": "API simples para aula de fundamentos com Node e Express",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "node",
+    "express",
+    "api",
+    "ensino-medio"
+  ],
+  "author": "3º SIS",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

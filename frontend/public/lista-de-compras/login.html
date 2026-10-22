@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lista de Compras • Login</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="src/icons/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="src/icons/favicon.ico">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="src/icons/icon-512x512.png">
+    
+    <link rel="stylesheet" href="src/css/login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="manifest" href="manifes.json">
+    <meta name="theme-color" content="#4F6D7A">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-wrapper">
+                <div class="logo-icon">
+                    <img src="src/icons/icon-512x512.png" alt="Lista de Compras" class="logo-image">
+                </div>
+                <h1 class="app-title">Lista<span>Compras</span></h1>
+                <p class="app-subtitle">Organize suas compras em família</p>
+            </div>
+
+            <div class="form-container">
+                <div class="input-group">
+                    <input type="email" id="email" class="input-field" placeholder=" " required>
+                    <label for="email" class="input-label">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                    <div class="input-highlight"></div>
+                </div>
+
+                <div class="input-group">
+                    <input type="password" id="senha" class="input-field" placeholder=" " required>
+                    <label for="senha" class="input-label">
+                        <i class="fas fa-lock"></i> Senha
+                    </label>
+                    <div class="input-highlight"></div>
+                    <button type="button" class="toggle-password" onclick="togglePassword()">
+                        <i class="far fa-eye"></i>
+                    </button>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="login()" class="btn-primary" id="loginBtn">
+                        <span class="btn-text">Entrar</span>
+                        <div class="spinner"></div>
+                    </button>
+                    
+                    <div class="divider">
+                        <span>ou</span>
+                    </div>
+
+                    <button onclick="cadastro()" class="btn-secondary" id="cadastroBtn">
+                        <span class="btn-text">Criar conta gratuita</span>
+                        <div class="spinner"></div>
+                    </button>
+                </div>
+
+                <div id="error-message" class="error-message"></div>
+            </div>
+
+            <div class="footer-links">
+                <a href="#" onclick="esqueciSenha()">Esqueci minha senha</a>
+                <span>•</span>
+                <a href="#" onclick="suporte()">Precisa de ajuda?</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { supabase } from './supabaseClient.js';
+
+        // Configuração global
+        window.supabase = supabase;
+        
+        // Função para toggle de senha
+        window.togglePassword = function() {
+            const senhaInput = document.getElementById('senha');
+            const icon = document.querySelector('.toggle-password i');
+            
+            if (senhaInput.type === 'password') {
+                senhaInput.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                senhaInput.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        };
+
+        // Função de login melhorada
+        window.login = async function() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('error-message');
+
+            if (!email || !senha) {
+                showError('Por favor, preencha todos os campos');
+                return;
+            }
+
+            try {
+                btn.classList.add('loading');
+                errorDiv.style.display = 'none';
+
+                const { data, error } = await supabase.auth.signInWithPassword({ 
+                    email, 
+                    password: senha 
+                });
+
+                if (error) throw error;
+
+                // Animação de sucesso
+                btn.classList.remove('loading');
+                btn.classList.add('success');
+                
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1000);
+
+            } catch (error) {
+                btn.classList.remove('loading');
+                showError(translateError(error.message));
+            }
+        };
+
+        // Função de cadastro melhorada
+        window.cadastro = async function() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('senha').value;
+            const btn = document.getElementById('cadastroBtn');
+            const errorDiv = document.getElementById('error-message');
+
+            if (!email || !senha) {
+                showError('Por favor, preencha todos os campos');
+                return;
+            }
+
+            if (senha.length < 6) {
+                showError('A senha deve ter pelo menos 6 caracteres');
+                return;
+            }
+
+            try {
+                btn.classList.add('loading');
+                errorDiv.style.display = 'none';
+
+                const { data, error } = await supabase.auth.signUp({ 
+                    email, 
+                    password: senha 
+                });
+
+                if (error) throw error;
+
+                btn.classList.remove('loading');
+                showSuccess('Cadastro realizado! Verifique seu email para confirmar.');
+
+            } catch (error) {
+                btn.classList.remove('loading');
+                showError(translateError(error.message));
+            }
+        };
+
+        // Funções auxiliares
+        window.esqueciSenha = function() {
+            alert('Funcionalidade em desenvolvimento. Por favor, entre em contato com o suporte.');
+        };
+
+        window.suporte = function() {
+            alert('Envie um email para: suporte@listacompras.app');
+        };
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.style.animation = 'shake 0.5s ease';
+            setTimeout(() => errorDiv.style.animation = '', 500);
+        }
+
+        function showSuccess(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            errorDiv.style.background = '#4CAF50';
+            errorDiv.style.color = 'white';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+                errorDiv.style.background = '';
+                errorDiv.style.color = '';
+            }, 3000);
+        }
+
+        function translateError(message) {
+            const translations = {
+                'Invalid login credentials': 'Email ou senha incorretos',
+                'Email not confirmed': 'Por favor, confirme seu email primeiro',
+                'User already registered': 'Este email já está cadastrado',
+                'Password should be at least 6 characters': 'A senha deve ter pelo menos 6 caracteres'
+            };
+            return translations[message] || message;
+        }
+
+        // Enter key handler
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                login();
+            }
+        });
+
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service.worker.js')
+                    .then(reg => console.log('SW registrado:', reg.scope))
+                    .catch(err => console.log('Erro SW:', err));
+            });
+        }
+    </script>
+</body>
+</html>
